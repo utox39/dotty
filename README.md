@@ -36,6 +36,9 @@ $ mkdir -p ~/.config/dotty
 
 # Copy the config file
 $ cp path/to/dotty/config.json ~/.config/dotty/config.json
+
+# Create the destination folder
+$ mkdir ~/dotfiles
 ```
 
 ## Usage
@@ -60,6 +63,7 @@ in ~/.config/dotty/config.json
 
 ## Roadmap
 
+- Improve customization
 - Improve checks
 - Publish it as a package
 - Automatic creation of the configuration file
