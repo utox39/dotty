@@ -88,16 +88,18 @@ func main() {
 	}
 
 	destinationPath := dotfile.DestinationPath
+	// Replace the ~ with the home folder path
 	destinationPath = strings.Replace(destinationPath, "~", homeFolder, 1)
 
+	// Check if the destination path exists
 	if _, err := os.Stat(destinationPath); errors.Is(err, os.ErrNotExist) {
 		fmt.Printf("dotty: %v: the directory does not exists.\n", destinationPath)
 		os.Exit(3)
 	}
 
 	for i := 0; i < len(dotfile.Filepath); i++ {
-		// Replace the ~ with the home folder path
 		filePath := dotfile.Filepath[i]
+		// Replace the ~ with the home folder path
 		filePath = strings.Replace(filePath, "~", homeFolder, 1)
 
 		if !strings.HasPrefix(filepath.Base(filePath), ".") {
