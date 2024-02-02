@@ -23,8 +23,6 @@ func CopyFile(filePath string) {
 
 	destinationPath := filepath.Join(homeFolder, "dotfiles/")
 
-	//fileAbsPath := filepath.Join(homeFolder, filePath)
-
 	// Open the file and save the content
 	file, err := os.Open(filePath)
 	if err != nil {
