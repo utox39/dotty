@@ -48,7 +48,7 @@ $ dotty
 To add the dotfile paths and destination path go to the configuration file
 in ~/.config/dotty/config.json
 
-> N.B Always remember to use the absolute path to the file
+> N.B Always remember to use the absolute path
 
 ```json
 {
