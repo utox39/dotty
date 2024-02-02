@@ -97,6 +97,12 @@ func main() {
 		// Replace the ~ with the home folder path
 		filePath := dotfile.Filepath[i]
 		filePath = strings.Replace(dotfile.Filepath[i], "~", homeFolder, 1)
+
+		if !strings.HasPrefix(filepath.Base(filePath), ".") {
+			fmt.Printf("dotty: %v is not a dotfile\n", filePath)
+			continue
+		}
+
 		if _, err := os.Stat(filePath); err == nil {
 			fmt.Printf("- Copying %v...\n", filePath)
 			CopyFile(filePath)
