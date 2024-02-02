@@ -36,9 +36,6 @@ $ mkdir -p ~/.config/dotty
 
 # Copy the config file
 $ cp path/to/dotty/config.json ~/.config/dotty/config.json
-
-# Create the destination folder
-$ mkdir ~/dotfiles
 ```
 
 ## Usage
@@ -48,7 +45,7 @@ $ dotty
 ```
 ### Configuration
 
-To add the paths to your dotfiles go to the configuration file
+To add paths to the dotfiles and destination path go to the configuration file
 in ~/.config/dotty/config.json
 
 > N.B Always remember to use the absolute path to the file
@@ -57,7 +54,8 @@ in ~/.config/dotty/config.json
 {
   "dotfiles" : [
     "~/.example", "~/Documents/.example2"
-  ]
+  ],
+  "destination-path" : "~/dotfiles/"
 }
 ```
 
