@@ -8,13 +8,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Dotfiles struct {
-	Filename []string `json:"dotfiles"`
+	Filepath []string `json:"dotfiles"`
 }
 
-func CopyFile(fileName string) {
+func CopyFile(filePath string) {
 	homeFolder, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
@@ -22,29 +23,29 @@ func CopyFile(fileName string) {
 
 	destinationPath := filepath.Join(homeFolder, "dotfiles/")
 
-	fileAbsPath := filepath.Join(homeFolder, fileName)
+	//fileAbsPath := filepath.Join(homeFolder, filePath)
 
 	// Open the file and save the content
-	file, err := os.Open(fileAbsPath)
+	file, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			log.Fatalf("Error closing the file %v: %v", fileAbsPath, err)
+			log.Fatalf("Error closing the file %v: %v", filePath, err)
 		}
 	}(file)
 
 	// Create a copy of the file to copy
-	newFile, err := os.Create(filepath.Join(destinationPath, fileName))
+	newFile, err := os.Create(filepath.Join(destinationPath, filepath.Base(filePath)))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer func(newFile *os.File) {
 		err := newFile.Close()
 		if err != nil {
-			log.Fatalf("Error closing the file %v: %v", fileAbsPath, err)
+			log.Fatalf("Error closing the file %v: %v", filepath.Base(filePath), err)
 		}
 	}(newFile)
 
@@ -60,7 +61,7 @@ func CopyFile(fileName string) {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%v copied successfully\n\n", fileName)
+	fmt.Printf("%v copied successfully\n\n", filePath)
 }
 
 func main() {
@@ -94,12 +95,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for i := 0; i < len(dotfile.Filename); i++ {
-		if _, err := os.Stat(filepath.Join(homeFolder, dotfile.Filename[i])); err == nil {
-			fmt.Printf("- Copying %v...\n", dotfile.Filename[i])
-			CopyFile(dotfile.Filename[i])
+	for i := 0; i < len(dotfile.Filepath); i++ {
+		// Replace the ~ with the home folder path
+		filePath := dotfile.Filepath[i]
+		filePath = strings.Replace(dotfile.Filepath[i], "~", homeFolder, 1)
+		if _, err := os.Stat(filePath); err == nil {
+			fmt.Printf("- Copying %v...\n", filePath)
+			CopyFile(filePath)
 		} else if errors.Is(err, os.ErrNotExist) {
-			fmt.Printf("dotty: %v does not exists", filepath.Join(homeFolder, dotfile.Filename[i]))
+			fmt.Printf("dotty: %v does not exists", filePath)
 			continue
 		} else {
 			log.Fatalf("dotty: error: %v", err)
