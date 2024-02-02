@@ -12,17 +12,11 @@ import (
 )
 
 type Dotfiles struct {
-	Filepath []string `json:"dotfiles"`
+	Filepath        []string `json:"dotfiles"`
+	DestinationPath string   `json:"destination-path"`
 }
 
-func CopyFile(filePath string) {
-	homeFolder, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	destinationPath := filepath.Join(homeFolder, "dotfiles/")
-
+func CopyFile(filePath string, destinationPath string) {
 	// Open the file and save the content
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -93,10 +87,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	destinationPath := dotfile.DestinationPath
+	destinationPath = strings.Replace(destinationPath, "~", homeFolder, 1)
+
+	if _, err := os.Stat(destinationPath); errors.Is(err, os.ErrNotExist) {
+		fmt.Printf("dotty: %v: the directory does not exists.\n", destinationPath)
+		os.Exit(3)
+	}
+
 	for i := 0; i < len(dotfile.Filepath); i++ {
 		// Replace the ~ with the home folder path
 		filePath := dotfile.Filepath[i]
-		filePath = strings.Replace(dotfile.Filepath[i], "~", homeFolder, 1)
+		filePath = strings.Replace(filePath, "~", homeFolder, 1)
 
 		if !strings.HasPrefix(filepath.Base(filePath), ".") {
 			fmt.Printf("dotty: %v is not a dotfile\n", filePath)
@@ -105,7 +107,7 @@ func main() {
 
 		if _, err := os.Stat(filePath); err == nil {
 			fmt.Printf("- Copying %v...\n", filePath)
-			CopyFile(filePath)
+			CopyFile(filePath, destinationPath)
 		} else if errors.Is(err, os.ErrNotExist) {
 			fmt.Printf("dotty: %v does not exists", filePath)
 			continue
