@@ -95,10 +95,8 @@ func main() {
 	}
 
 	for i := 0; i < len(dotfile.Filename); i++ {
-		fmt.Printf("Saving %v...\n", dotfile.Filename[i])
-
 		if _, err := os.Stat(filepath.Join(homeFolder, dotfile.Filename[i])); err == nil {
-			fmt.Printf("copying %v...\n", dotfile.Filename[i])
+			fmt.Printf("- Copying %v...\n", dotfile.Filename[i])
 			CopyFile(dotfile.Filename[i])
 		} else if errors.Is(err, os.ErrNotExist) {
 			fmt.Printf("dotty: %v does not exists", filepath.Join(homeFolder, dotfile.Filename[i]))
