@@ -20,7 +20,7 @@ Backup your dotfiles of choice in a folder
 
 ```bash
 # Clone the repo
-$ git clone ...
+$ git clone https://github.com/utox39/dotty.git
 
 # cd to the repo
 $ cd path/to/dotty
