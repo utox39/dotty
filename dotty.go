@@ -99,10 +99,14 @@ func CopyFile(filePath string, destinationPath string) error {
 }
 
 func AddFile(newFilePath string) error {
-	if _, err := os.Stat(newFilePath); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("%v does not exist\n", newFilePath)
-	} else if err != nil {
-		return fmt.Errorf("add file error: %v", err)
+	absFilePath, err := filepath.Abs(newFilePath)
+	if err != nil {
+		return fmt.Errorf("could not determine absolute path of file %v: %v", newFilePath, err)
+	}
+
+	err = ValidatePath(&absFilePath)
+	if err != nil {
+		return err
 	}
 
 	// Get home folder
@@ -116,11 +120,10 @@ func AddFile(newFilePath string) error {
 	byteValue, err := ReadFile(&jsonConfigPath)
 
 	// Add the new dotfile to the end of the dotfiles array
-	value, err := sjson.Set(string(byteValue), "dotfiles.-1", newFilePath)
+	value, err := sjson.Set(string(byteValue), "dotfiles.-1", absFilePath)
 	if err != nil {
 		return fmt.Errorf("error adding the new dotfile to the dotfiles array %v: %v", jsonConfigPath, err)
 	}
-
 	err = os.WriteFile(jsonConfigPath, []byte(value), 0644)
 	if err != nil {
 		return fmt.Errorf("error writing the file %v: %v", jsonConfigPath, err)
