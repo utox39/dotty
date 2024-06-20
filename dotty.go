@@ -156,6 +156,7 @@ func AddFile(newFilePath string) error {
 
 	byteValue, _ := io.ReadAll(jsonFile)
 
+	// Add the new dotfile to the end of the dotfiles array
 	value, _ := sjson.Set(string(byteValue), "dotfiles.-1", newFilePath)
 
 	err = os.WriteFile(jsonConfigPath, []byte(value), 0644)
