@@ -40,9 +40,18 @@ $ cp path/to/dotty/config.json ~/.config/dotty/config.json
 
 ## Usage
 
+#### Backup the dotfiles
+
 ```bash
-$ dotty
+$ dotty backup
 ```
+
+#### Add new dotfile
+
+```bash
+$ dotty add .foo
+```
+
 ### Configuration
 
 To add the dotfile paths and destination path go to the configuration file
