@@ -26,7 +26,7 @@ $ git clone https://github.com/utox39/dotty.git
 $ cd path/to/dotty
 
 # Build dotty
-$ go build dotty.go
+$ go build ./...
 
 # Then move it somewhere in your $PATH. Here is an example:
 $ mv dotty ~/bin
