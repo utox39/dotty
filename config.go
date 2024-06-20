@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tidwall/sjson"
 	"os"
 	"path/filepath"
 )
@@ -30,6 +31,40 @@ func (d *Dotfiles) ReadConfig() error {
 	err = json.Unmarshal(byteValue, d)
 	if err != nil {
 		return fmt.Errorf("error unmarshalling json: %v", err)
+	}
+
+	return nil
+}
+
+func AddFile(newFilePath string) error {
+	absFilePath, err := filepath.Abs(newFilePath)
+	if err != nil {
+		return fmt.Errorf("could not determine absolute path of file %v: %v", newFilePath, err)
+	}
+
+	err = ValidatePath(&absFilePath)
+	if err != nil {
+		return err
+	}
+
+	// Get home folder
+	homeFolder, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("error getting user home folder %v", err)
+	}
+
+	// Read json config file
+	jsonConfigPath := filepath.Join(homeFolder, ".config/dotty/config.json")
+	byteValue, err := ReadFile(&jsonConfigPath)
+
+	// Add the new dotfile to the end of the dotfiles array
+	value, err := sjson.Set(string(byteValue), "dotfiles.-1", absFilePath)
+	if err != nil {
+		return fmt.Errorf("error adding the new dotfile to the dotfiles array %v: %v", jsonConfigPath, err)
+	}
+	err = os.WriteFile(jsonConfigPath, []byte(value), 0644)
+	if err != nil {
+		return fmt.Errorf("error writing the file %v: %v", jsonConfigPath, err)
 	}
 
 	return nil
