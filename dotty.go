@@ -113,14 +113,19 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:  "backup",
+				Usage: "backup your dotfiles",
+				Action: func(cCtx *cli.Context) error {
+					err := Backup()
+					if err != nil {
+						LogErr(err)
+					}
+					return nil
+				},
+			},
 		},
-		Action: func(*cli.Context) error {
-			err := Backup()
-			if err != nil {
-				LogErr(err)
-			}
-			return nil
-		},
+		Action:  nil,
 		Version: "1.0.0",
 	}
 
