@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,73 +12,43 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type Dotfiles struct {
-	Filepath        []string `json:"dotfiles"`
-	DestinationPath string   `json:"destination-path"`
-}
-
 func Backup() error {
 	fmt.Println("Hello world from dotty :)")
 
-	// Get home folder
-	homeFolder, err := os.UserHomeDir()
+	dotfiles := &Dotfiles{}
+
+	err := dotfiles.ReadConfig()
 	if err != nil {
-		return fmt.Errorf("error getting user home folder %v", err)
+		return err
 	}
 
-	// Read json config file
-	jsonConfigPath := filepath.Join(homeFolder, ".config/dotty/config.json")
-	jsonFile, err := os.Open(jsonConfigPath)
-	if err != nil {
-		return fmt.Errorf("error opening config file %v", err)
-	}
-	defer func(jsonFile *os.File) {
-		err := jsonFile.Close()
-		if err != nil {
-			LogErr(fmt.Errorf("error closing the file %v: %v", jsonFile, err))
-		}
-	}(jsonFile)
-
-	byteValue, err := io.ReadAll(jsonFile)
-	if err != nil {
-		return fmt.Errorf("error reading config file %v", err)
-	}
-
-	// Parse the json file
-	var dotfile Dotfiles
-	err = json.Unmarshal(byteValue, &dotfile)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling json: %v", err)
-	}
-
-	destinationPath := dotfile.DestinationPath
-	// Replace the ~ with the home folder path
-	destinationPath = strings.Replace(destinationPath, "~", homeFolder, 1)
+	// The destination path specified in the config file
+	destinationPath := dotfiles.DestinationPath
 
 	// Check if the destination path exists
-	if _, err := os.Stat(destinationPath); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("%v: the directory does not exist.\n", destinationPath)
+	err = ValidatePath(&destinationPath)
+	if err != nil {
+		return err
 	}
 
-	for i := 0; i < len(dotfile.Filepath); i++ {
-		filePath := dotfile.Filepath[i]
-		// Replace the ~ with the home folder path
-		filePath = strings.Replace(filePath, "~", homeFolder, 1)
+	for i := 0; i < len(dotfiles.Filepath); i++ {
+		filePath := dotfiles.Filepath[i]
+
+		err := ValidatePath(&filePath)
+		if errors.Is(err, os.ErrNotExist) {
+			fmt.Printf("dotty: %v does not exist", filePath)
+			continue
+		} else if err != nil {
+			return err
+		}
 
 		if !strings.HasPrefix(filepath.Base(filePath), ".") {
 			fmt.Printf("dotty: %v is not a dotfile\n", filePath)
 			continue
 		}
 
-		if _, err := os.Stat(filePath); err == nil {
-			fmt.Printf("- Copying %v...\n", filePath)
-			if err := CopyFile(filePath, destinationPath); err != nil {
-				return err
-			}
-		} else if errors.Is(err, os.ErrNotExist) {
-			fmt.Printf("dotty: %v does not exist", filePath)
-			continue
-		} else {
+		fmt.Printf("- Copying %v...\n", filePath)
+		if err := CopyFile(filePath, destinationPath); err != nil {
 			return err
 		}
 	}
@@ -144,21 +113,7 @@ func AddFile(newFilePath string) error {
 
 	// Read json config file
 	jsonConfigPath := filepath.Join(homeFolder, ".config/dotty/config.json")
-	jsonFile, err := os.Open(jsonConfigPath)
-	if err != nil {
-		return fmt.Errorf("error opening the file %v: %v", jsonConfigPath, err)
-	}
-	defer func(jsonFile *os.File) {
-		err := jsonFile.Close()
-		if err != nil {
-			LogErr(fmt.Errorf("error closing the file %v: %v", jsonFile, err))
-		}
-	}(jsonFile)
-
-	byteValue, err := io.ReadAll(jsonFile)
-	if err != nil {
-		return fmt.Errorf("error reading the file %v: %v", jsonConfigPath, err)
-	}
+	byteValue, err := ReadFile(&jsonConfigPath)
 
 	// Add the new dotfile to the end of the dotfiles array
 	value, err := sjson.Set(string(byteValue), "dotfiles.-1", newFilePath)
