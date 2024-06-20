@@ -74,7 +74,6 @@ in ~/.config/dotty/config.json
 - Improve checks
 - Publish it as a package
 - Automatic creation of the configuration file
-- Ability to add a file via command line command
 
 ## Contributing
 
