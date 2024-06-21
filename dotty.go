@@ -24,6 +24,12 @@ func Backup() error {
 	// The destination path specified in the config file
 	destinationPath := dotfiles.DestinationPath
 
+	// Replace the ~ with the home folder path
+	err = ReplaceTilde(&destinationPath)
+	if err != nil {
+		return err
+	}
+
 	// Check if the destination path exists
 	err = ValidatePath(&destinationPath)
 	if err != nil {
@@ -33,7 +39,13 @@ func Backup() error {
 	for i := 0; i < len(dotfiles.Filepath); i++ {
 		filePath := dotfiles.Filepath[i]
 
-		err := ValidatePath(&filePath)
+		// Replace the ~ with the home folder path
+		err = ReplaceTilde(&filePath)
+		if err != nil {
+			return err
+		}
+
+		err = ValidatePath(&filePath)
 		if errors.Is(err, os.ErrNotExist) {
 			fmt.Printf("dotty: %v does not exist", filePath)
 			continue

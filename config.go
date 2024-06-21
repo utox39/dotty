@@ -42,6 +42,12 @@ func AddFile(newFilePath string) error {
 		return fmt.Errorf("could not determine absolute path of file %v: %v", newFilePath, err)
 	}
 
+	// Replace the ~ with the home folder path
+	err = ReplaceTilde(&absFilePath)
+	if err != nil {
+		return err
+	}
+
 	err = ValidatePath(&absFilePath)
 	if err != nil {
 		return err

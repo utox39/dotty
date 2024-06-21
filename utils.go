@@ -10,16 +10,6 @@ import (
 
 // ValidatePath clean and check the path
 func ValidatePath(path *string) error {
-	// Replace the ~ with the home folder path
-	if strings.HasPrefix(*path, "~") {
-		homeFolder, err := os.UserHomeDir()
-		if err != nil {
-			return fmt.Errorf("error getting user home folder %v", err)
-		}
-
-		*path = strings.Replace(*path, "~", homeFolder, 1)
-	}
-
 	// Clean the path
 	*path = filepath.Clean(*path)
 
@@ -31,10 +21,32 @@ func ValidatePath(path *string) error {
 	return nil
 }
 
+// ReplaceTilde replaces the ~ with the home folder path
+func ReplaceTilde(path *string) error {
+	// Replace the ~ with the home folder path
+	if strings.HasPrefix(*path, "~") {
+		homeFolder, err := os.UserHomeDir()
+		if err != nil {
+			return fmt.Errorf("error getting user home folder %v", err)
+		}
+
+		*path = strings.Replace(*path, "~", homeFolder, 1)
+	}
+
+	return nil
+}
+
 // ReadFile returns the contents of a file
 func ReadFile(path *string) ([]byte, error) {
+	// Replace the ~ with the home folder path
+	err := ReplaceTilde(path)
+	if err != nil {
+		return nil, err
+	}
+
 	// Validate the path
-	if err := ValidatePath(path); err != nil {
+	err = ValidatePath(path)
+	if err != nil {
 		return nil, err
 	}
 
