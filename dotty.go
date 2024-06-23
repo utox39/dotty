@@ -16,7 +16,16 @@ func Backup() error {
 
 	dotfiles := &Dotfiles{}
 
-	err := dotfiles.ReadConfig()
+	// Get home folder
+	homeFolder, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("error getting user home folder %v", err)
+	}
+
+	// Read json config file
+	jsonConfigPath := filepath.Join(homeFolder, ".config/dotty/config.json")
+
+	err = dotfiles.ReadConfig(jsonConfigPath)
 	if err != nil {
 		return err
 	}
@@ -118,7 +127,16 @@ func main() {
 				Name:  "add",
 				Usage: "add a dotfile to the list",
 				Action: func(cCtx *cli.Context) error {
-					err := AddFile(cCtx.Args().Get(0))
+					// Get home folder
+					homeFolder, err := os.UserHomeDir()
+					if err != nil {
+						return fmt.Errorf("error getting user home folder %v", err)
+					}
+
+					// Read json config file
+					jsonConfigPath := filepath.Join(homeFolder, ".config/dotty/config.json")
+
+					err = AddFile(cCtx.Args().Get(0), jsonConfigPath)
 					if err != nil {
 						LogErr(err)
 					}

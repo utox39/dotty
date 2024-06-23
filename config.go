@@ -13,15 +13,8 @@ type Dotfiles struct {
 	DestinationPath string   `json:"destination-path"`
 }
 
-func (d *Dotfiles) ReadConfig() error {
-	// Get home folder
-	homeFolder, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("error getting user home folder %v", err)
-	}
-
+func (d *Dotfiles) ReadConfig(jsonConfigPath string) error {
 	// Read json config file
-	jsonConfigPath := filepath.Join(homeFolder, ".config/dotty/config.json")
 	byteValue, err := ReadFile(&jsonConfigPath)
 	if err != nil {
 		return err
@@ -36,7 +29,7 @@ func (d *Dotfiles) ReadConfig() error {
 	return nil
 }
 
-func AddFile(newFilePath string) error {
+func AddFile(newFilePath, jsonConfigPath string) error {
 	absFilePath, err := filepath.Abs(newFilePath)
 	if err != nil {
 		return fmt.Errorf("could not determine absolute path of file %v: %v", newFilePath, err)
@@ -53,14 +46,6 @@ func AddFile(newFilePath string) error {
 		return err
 	}
 
-	// Get home folder
-	homeFolder, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("error getting user home folder %v", err)
-	}
-
-	// Read json config file
-	jsonConfigPath := filepath.Join(homeFolder, ".config/dotty/config.json")
 	byteValue, err := ReadFile(&jsonConfigPath)
 
 	// Add the new dotfile to the end of the dotfiles array
