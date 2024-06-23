@@ -45,8 +45,8 @@ func Backup() error {
 		return err
 	}
 
-	for i := 0; i < len(dotfiles.Filepath); i++ {
-		filePath := dotfiles.Filepath[i]
+	for i := 0; i < len(dotfiles.Dotfiles); i++ {
+		filePath := dotfiles.Dotfiles[i]
 
 		// Replace the ~ with the home folder path
 		err = ReplaceTilde(&filePath)

@@ -9,7 +9,7 @@ import (
 )
 
 type Dotfiles struct {
-	Filepath        []string `json:"dotfiles"`
+	Dotfiles        []string `json:"dotfiles"`
 	DestinationPath string   `json:"destination-path"`
 }
 
