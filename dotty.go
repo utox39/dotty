@@ -133,7 +133,6 @@ func main() {
 						return fmt.Errorf("error getting user home folder %v", err)
 					}
 
-					// Read json config file
 					jsonConfigPath := filepath.Join(homeFolder, ".config/dotty/config.json")
 
 					err = AddFile(cCtx.Args().Get(0), jsonConfigPath)
